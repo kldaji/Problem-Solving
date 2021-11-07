@@ -1,5 +1,8 @@
 package baekjoon.dfs_bfs
 
+import java.util.*
+import kotlin.math.max
+
 fun main() {
     val br = System.`in`.bufferedReader()
     val bw = System.out.bufferedWriter()
@@ -10,8 +13,7 @@ fun main() {
     }
     val dx = listOf(1, -1, 0, 0)
     val dy = listOf(0, 0, 1, -1)
-    val queue = mutableListOf<Pair<Int, Int>>()
-    val visited = Array(n) { Array(m) { false } }
+    val queue: Queue<Pair<Int, Int>> = LinkedList()
     for (i in 0 until n) {
         for (j in 0 until m) {
             if (tomatoes[i][j] == 1) {
@@ -20,30 +22,28 @@ fun main() {
         }
     }
     while (queue.isNotEmpty()) {
-        val (y, x) = queue.removeFirst()
-        visited[y][x] = true
+        val (y, x) = queue.poll()
         for (i in 0..3) {
             val nx = x + dx[i]
             val ny = y + dy[i]
-            if (nx in 0 until m && ny in 0 until n && !visited[ny][nx] && tomatoes[ny][nx] == 0) {
-                visited[ny][nx] = true
+            if (nx in 0 until m && ny in 0 until n && tomatoes[ny][nx] == 0) {
                 queue.add(Pair(ny, nx))
                 tomatoes[ny][nx] = tomatoes[y][x] + 1
             }
         }
     }
-    var flag = false
-    tomatoes.forEach {
-        if (it.contains(0)) {
-            flag = true
-            return@forEach
-        }
-    }
-    if (!flag) {
-        bw.write("${tomatoes.maxOf { list -> list.maxOf { it } } - 1}")
-    } else {
-        bw.write("-1")
-    }
+    bw.write("${getResult(tomatoes, m, n)}")
     br.close()
     bw.close()
+}
+
+fun getResult(tomatoes: MutableList<MutableList<Int>>, m: Int, n: Int): Int {
+    var result = 0
+    for (i in 0 until n) {
+        for (j in 0 until m) {
+            if (tomatoes[i][j] == 0) return -1
+            result = max(result, tomatoes[i][j])
+        }
+    }
+    return result - 1
 }
